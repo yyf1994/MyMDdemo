@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,12 +16,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.yyf.mymedemo.R;
 import com.yyf.mymedemo.adpater.MyRecyclerviewAdapter;
+import com.yyf.mymedemo.model.Book;
+import com.yyf.mymedemo.net.retrofit.NetWork;
+import com.yyf.mymedemo.service.MDService;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class NavigationDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -28,6 +37,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private RecyclerView recyclerView;
     private List<String> mData;
     private MyRecyclerviewAdapter mAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,19 +71,42 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
 
-        mData = new ArrayList<String>();
+        getData();
 
-        for(int i = 0;i<100;i++){
-            mData.add(i+"");
-        }
+
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(NavigationDrawerActivity.this);
         recyclerView.setLayoutManager(layoutManager);
 
        /* RecyclerView.LayoutManager layoutManager = new GridLayoutManager(MainActivity.this,3);
         recyclerView.setLayoutManager(layoutManager);*/
         recyclerView.setHasFixedSize(true);
-        mAdapter= new MyRecyclerviewAdapter(NavigationDrawerActivity.this,mData);
-        recyclerView.setAdapter(mAdapter);
+
+
+    }
+
+    private void getData() {
+
+        //https://api.douban.com/v2/book/1220562
+        Call<Book> call =NetWork.getRetrofit().create(MDService.class).loadBook();
+        call.enqueue(new Callback<Book>() {
+            @Override
+            public void onResponse(Call<Book> call, Response<Book> response) {
+                mData = new ArrayList<String>();
+                for(int i = 0;i<100;i++){
+                    mData.add(response.body().getAuthor().toString()+i);
+                }
+                mAdapter= new MyRecyclerviewAdapter(NavigationDrawerActivity.this,mData);
+                recyclerView.setAdapter(mAdapter);
+                Toast.makeText(NavigationDrawerActivity.this,"response:"+response.body().getAuthor(),Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<Book> call, Throwable t) {
+
+                Log.d("error","error:"+t);
+
+            }
+        });
 
     }
 
