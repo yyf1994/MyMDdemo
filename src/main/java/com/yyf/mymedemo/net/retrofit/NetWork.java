@@ -1,7 +1,5 @@
 package com.yyf.mymedemo.net.retrofit;
 
-import com.yyf.mymedemo.service.MDService;
-
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 

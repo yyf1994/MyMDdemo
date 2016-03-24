@@ -102,9 +102,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
 
             @Override
             public void onFailure(Call<Book> call, Throwable t) {
-
                 Log.d("error","error:"+t);
-
             }
         });
 
