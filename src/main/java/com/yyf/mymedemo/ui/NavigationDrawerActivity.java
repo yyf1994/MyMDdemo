@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.yyf.mymedemo.R;
 import com.yyf.mymedemo.adpater.MyRecyclerviewAdapter;
+import com.yyf.mymedemo.adpater.MyRecyclerviewHolder;
 import com.yyf.mymedemo.model.Book;
 import com.yyf.mymedemo.net.retrofit.NetWork;
 import com.yyf.mymedemo.service.MDService;
@@ -35,7 +36,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView recyclerView;
-    private List<String> mData;
+    private List<Book> mData;
     private MyRecyclerviewAdapter mAdapter;
 
 
@@ -91,11 +92,30 @@ public class NavigationDrawerActivity extends AppCompatActivity
         call.enqueue(new Callback<Book>() {
             @Override
             public void onResponse(Call<Book> call, Response<Book> response) {
-                mData = new ArrayList<String>();
-                for(int i = 0;i<100;i++){
-                    mData.add(response.body().getAuthor().toString()+i);
-                }
-                mAdapter= new MyRecyclerviewAdapter(NavigationDrawerActivity.this,mData);
+                mData = new ArrayList<>();
+                mData.add(response.body());
+
+                mAdapter = new MyRecyclerviewAdapter(NavigationDrawerActivity.this,mData){
+
+                    @Override
+                    public void onBindViewHolder(MyRecyclerviewHolder holder, int position) {
+                        bindData(holder, position, mData);
+                    }
+
+                    @Override
+                    public int getItemLayoutId(int viewType) {
+                        return R.layout.recyclerview_item;
+                    }
+
+                    @Override
+                    public void bindData(MyRecyclerviewHolder holder, int position, Object item) {
+                        Book book = ((List<Book>)item).get(position);
+                        holder.setText(R.id.translator, book.getTranslator().toString());
+                        holder.setText(R.id.author,book.getAuthor().toString());
+//                        holder.setImageView(R.id.image,book.getImage().toString());
+                    }
+
+                };
                 recyclerView.setAdapter(mAdapter);
                 Toast.makeText(NavigationDrawerActivity.this,"response:"+response.body().getAuthor(),Toast.LENGTH_SHORT).show();
             }

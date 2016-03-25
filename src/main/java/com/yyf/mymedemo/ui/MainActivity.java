@@ -52,8 +52,8 @@ public class MainActivity extends AppCompatActivity {
        /* RecyclerView.LayoutManager layoutManager = new GridLayoutManager(MainActivity.this,3);
         recyclerView.setLayoutManager(layoutManager);*/
         recyclerView.setHasFixedSize(true);
-        mAdapter= new MyRecyclerviewAdapter(MainActivity.this,mData);
-        recyclerView.setAdapter(mAdapter);
+//        mAdapter= new MyRecyclerviewAdapter(MainActivity.this,mData);
+//        recyclerView.setAdapter(mAdapter);
     }
 
     @Override
