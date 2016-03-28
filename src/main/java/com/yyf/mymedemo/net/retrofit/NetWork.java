@@ -8,7 +8,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class NetWork {
 
-    private static final String _host = "https://api.douban.com";
+//    private static final String _host = "https://api.douban.com";
+
+    private static final String _host = "http://op.juhe.cn";
 
     public static Retrofit getRetrofit(){
         return new retrofit2.Retrofit.Builder().

@@ -14,6 +14,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.yyf.mymedemo.R;
 
 import java.io.IOException;
@@ -84,7 +86,9 @@ public class MyRecyclerviewHolder<T> extends  RecyclerView.ViewHolder {
 
     public MyRecyclerviewHolder setImageView(int viewId, String url) {
         ImageView view = findViewById(viewId);
-        view.setImageBitmap(returnBitMap(url));
+        Glide.with(mContext).load(url)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)//缓存全尺寸
+                .into(view);
         return this;
     }
 
@@ -92,27 +96,6 @@ public class MyRecyclerviewHolder<T> extends  RecyclerView.ViewHolder {
         View view = findViewById(viewId);
         view.setOnClickListener(listener);
         return this;     }
-
-    public Bitmap returnBitMap(String url) {
-        URL myFileUrl = null;
-        Bitmap bitmap = null;
-        try {
-            myFileUrl = new URL(url);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        try {
-            HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
-            conn.setDoInput(true);
-            conn.connect();
-            InputStream is = conn.getInputStream();
-            bitmap = BitmapFactory.decodeStream(is);
-            is.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return bitmap;
-    }
 
 }
 

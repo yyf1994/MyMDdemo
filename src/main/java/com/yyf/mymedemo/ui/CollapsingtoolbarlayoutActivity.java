@@ -11,9 +11,13 @@ import android.widget.Toast;
 
 import com.yyf.mymedemo.R;
 import com.yyf.mymedemo.model.Book;
+import com.yyf.mymedemo.model.News;
+import com.yyf.mymedemo.model.NewsResult;
 import com.yyf.mymedemo.model.UserInfo;
 import com.yyf.mymedemo.net.retrofit.NetWork;
 import com.yyf.mymedemo.service.MDService;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -22,6 +26,8 @@ import retrofit2.Response;
 public class CollapsingtoolbarlayoutActivity extends AppCompatActivity {
 
    private  TextView tv;
+    private String APPKEY="1e3d2cd47356e49c5148c791e6e72ba8";
+    private List<NewsResult> mData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,16 +52,23 @@ public class CollapsingtoolbarlayoutActivity extends AppCompatActivity {
 
     private void getData() {
 
-        Call<UserInfo> call = NetWork.getRetrofit().create(MDService.class).loadUserInfo("ahbei");
-               call .enqueue(new Callback <UserInfo>() {
-
+        Call<News> call = NetWork.getRetrofit().create(MDService.class).loadNewsPost("北京","json",APPKEY);
+               call .enqueue(new Callback <News>() {
                     @Override
-                    public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
-                        tv.setText(response.body().getTitle());
+                    public void onResponse(Call<News> call, Response<News> response) {
+                        News news = response.body();
+                        mData = news.getResult();
+                        if(mData == null){
+                            return;
+                        }
+                        for(int i = 0;i<mData.size();i++){
+                            tv.setText(mData.get(i).getTitle());
+                        }
+
                     }
 
                     @Override
-                    public void onFailure(Call<UserInfo> call, Throwable t) {
+                    public void onFailure(Call<News> call, Throwable t) {
                         Toast.makeText(CollapsingtoolbarlayoutActivity.this,t.getMessage(),Toast.LENGTH_SHORT).show();
                     }
                 });

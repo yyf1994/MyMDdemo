@@ -22,6 +22,8 @@ import com.yyf.mymedemo.R;
 import com.yyf.mymedemo.adpater.MyRecyclerviewAdapter;
 import com.yyf.mymedemo.adpater.MyRecyclerviewHolder;
 import com.yyf.mymedemo.model.Book;
+import com.yyf.mymedemo.model.News;
+import com.yyf.mymedemo.model.NewsResult;
 import com.yyf.mymedemo.net.retrofit.NetWork;
 import com.yyf.mymedemo.service.MDService;
 
@@ -36,8 +38,9 @@ public class NavigationDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView recyclerView;
-    private List<Book> mData;
+    private List<NewsResult> mData;
     private MyRecyclerviewAdapter mAdapter;
+    private String APPKEY="1e3d2cd47356e49c5148c791e6e72ba8";
 
 
     @Override
@@ -88,44 +91,80 @@ public class NavigationDrawerActivity extends AppCompatActivity
     private void getData() {
 
         //https://api.douban.com/v2/book/1220562
-        Call<Book> call =NetWork.getRetrofit().create(MDService.class).loadBook();
+      /*  Call<Book> call =NetWork.getRetrofit().create(MDService.class).loadBook();
         call.enqueue(new Callback<Book>() {
             @Override
             public void onResponse(Call<Book> call, Response<Book> response) {
-                mData = new ArrayList<>();
-                mData.add(response.body());
 
-                mAdapter = new MyRecyclerviewAdapter(NavigationDrawerActivity.this,mData){
+                RpSuccess(response);
 
-                    @Override
-                    public void onBindViewHolder(MyRecyclerviewHolder holder, int position) {
-                        bindData(holder, position, mData);
-                    }
-
-                    @Override
-                    public int getItemLayoutId(int viewType) {
-                        return R.layout.recyclerview_item;
-                    }
-
-                    @Override
-                    public void bindData(MyRecyclerviewHolder holder, int position, Object item) {
-                        Book book = ((List<Book>)item).get(position);
-                        holder.setText(R.id.translator, book.getTranslator().toString());
-                        holder.setText(R.id.author,book.getAuthor().toString());
-//                        holder.setImageView(R.id.image,book.getImage().toString());
-                    }
-
-                };
-                recyclerView.setAdapter(mAdapter);
-                Toast.makeText(NavigationDrawerActivity.this,"response:"+response.body().getAuthor(),Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(Call<Book> call, Throwable t) {
                 Log.d("error","error:"+t);
             }
+        });*/
+
+        Call<News> call =NetWork.getRetrofit().create(MDService.class).loadNews("北京","json",APPKEY);
+        call.enqueue(new Callback<News>() {
+            @Override
+            public void onResponse(Call<News> call, Response<News> response) {
+                RpSuccess(response);
+            }
+
+            @Override
+            public void onFailure(Call<News> call, Throwable t) {
+                Log.d("error","error:"+t);
+            }
         });
 
+    }
+
+    //请求成功
+    private void RpSuccess(Response<News> response) {
+        News news = response.body();
+        mData = news.getResult();
+        if(mData == null){
+            return;
+        }
+        mAdapter = new MyRecyclerviewAdapter(NavigationDrawerActivity.this,mData){
+
+            @Override
+            public void onBindViewHolder(MyRecyclerviewHolder holder, int position) {
+                bindData(holder, position, mData.get(position));
+            }
+
+            @Override
+            public int getItemLayoutId(int viewType) {
+                return R.layout.recyclerview_item;
+            }
+
+            @Override
+            public void bindData(MyRecyclerviewHolder holder, int position, Object item) {
+                if(item ==null){
+                    return;
+                }
+                holder.setText(R.id.title,  ((NewsResult)item).getFull_title().toString());
+                holder.setText(R.id.content, ((NewsResult)item).getContent().toString());
+                holder.setImageView(R.id.image,((NewsResult)item).getImg().toString());
+            }
+        };
+        recyclerView.setAdapter(mAdapter);
+
+        mAdapter.setOnItemClickListener(new MyRecyclerviewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View itemView, int pos) {
+                Toast.makeText(NavigationDrawerActivity.this, "click " + pos, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        mAdapter.setOnItemLongClickListener(new MyRecyclerviewAdapter.OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(View itemView, int pos) {
+                Toast.makeText(NavigationDrawerActivity.this, "clickLONG " + pos, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
