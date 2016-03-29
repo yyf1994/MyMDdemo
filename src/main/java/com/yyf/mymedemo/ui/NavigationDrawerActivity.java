@@ -37,7 +37,8 @@ import retrofit2.Response;
 public class NavigationDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private RecyclerView recyclerView;
+//    private RecyclerView recyclerView;
+    private SupportRecyclerView recyclerView;
     private List<NewsResult> mData;
     private MyRecyclerviewAdapter mAdapter;
     private String APPKEY="1e3d2cd47356e49c5148c791e6e72ba8";
@@ -73,13 +74,15 @@ public class NavigationDrawerActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
+        recyclerView = (SupportRecyclerView) findViewById(R.id.recyclerview);
 
         getData();
 
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(NavigationDrawerActivity.this);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(new RecycleViewDivider(
+                NavigationDrawerActivity.this, LinearLayoutManager.VERTICAL));
 
        /* RecyclerView.LayoutManager layoutManager = new GridLayoutManager(MainActivity.this,3);
         recyclerView.setLayoutManager(layoutManager);*/
@@ -124,9 +127,11 @@ public class NavigationDrawerActivity extends AppCompatActivity
     //请求成功
     private void RpSuccess(Response<News> response) {
         News news = response.body();
+        Toast.makeText(NavigationDrawerActivity.this,news.getReason(),Toast.LENGTH_SHORT).show();
         mData = news.getResult();
         if(mData == null){
-            return;
+//            return;
+            recyclerView.setEmptyView(findViewById(R.id.empty_view));
         }
         mAdapter = new MyRecyclerviewAdapter(NavigationDrawerActivity.this,mData){
 
